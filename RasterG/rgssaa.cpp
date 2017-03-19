@@ -12,24 +12,24 @@
 void RgBlur(Mat &src)
 {
     Mat copy = src.clone();
-//    int c = 3;
-//    int filter[9] = {1, 2, 1, 2, 4, 2, 1, 2, 1};
-    int c = 7;
-    int filter[49] = {1, 2, 3, 4, 3, 2, 1,
-        2, 4, 6, 8, 6, 4, 2,
-        3, 6, 9, 12, 9, 6, 3,
-        4, 8, 12, 16, 12, 8, 4,
-        3, 6, 9, 12, 9, 6, 3,
-        2, 4, 6, 8, 6, 4, 2,
-        1, 2, 3, 4, 3, 2, 1};
+    int c = 3, dc = c / 2;
+    int filter[9] = {1, 2, 1, 2, 4, 2, 1, 2, 1};
+//    int c = 7, dc = c / 2;
+//    int filter[49] = {1, 2, 3, 4, 3, 2, 1,
+//        2, 4, 6, 8, 6, 4, 2,
+//        3, 6, 9, 12, 9, 6, 3,
+//        4, 8, 12, 16, 12, 8, 4,
+//        3, 6, 9, 12, 9, 6, 3,
+//        2, 4, 6, 8, 6, 4, 2,
+//        1, 2, 3, 4, 3, 2, 1};
     int rows = src.rows, cols = src.cols;
     for(int i = 0; i < rows; i ++)
         for(int j = 0; j < cols; j ++)
         {
             int weight = 0, cnt = 0;
             int sumb = 0, sumg = 0, sumr = 0;
-            for(int dr = c / 2, ii = - dr; ii <= dr; ii ++)
-                for(int dc = c / 2, jj = - dc; jj <= dc; jj ++)
+            for(int ii = - dc; ii <= dc; ii ++)
+                for(int jj = - dc; jj <= dc; jj ++)
                 {
                     int x = i + ii, y = j + jj;
                     if(x >= 0 && x < rows && y >= 0 && y < cols)

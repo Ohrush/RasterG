@@ -8,14 +8,12 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 #include "rgline.h"
 #include "rgarc.h"
 #include "rgfill.h"
 #include "rgssaa.h"
 #include <iostream>
 #include <fstream>
-#include <unistd.h>
 using namespace cv;
 using namespace std;
 
@@ -127,7 +125,7 @@ void drawAreas(Mat &src, Vec3b bg, vector<MyArea> &areas, int c = 1)
 {
     for(int i = 0, len = areas.size(); i < len; i ++)
     {
-        MyArea area = areas[0];
+        MyArea area = areas[i];
         RgScanLineFill4(src, area.inside * c, bg, area.color);
     }
 }
@@ -148,6 +146,12 @@ int main(int argc, const char * argv[]) {
     readAreas("./areas", areas);
     Mat lg(width_lg, height_lg, CV_8UC3, Scalar(bgColor[0], bgColor[1], bgColor[2]));
     Mat output(width, height, CV_8UC3, Scalar(bgColor[0], bgColor[1], bgColor[2]));
+    Mat aaoutput(width, height, CV_8UC3, Scalar(bgColor[0], bgColor[1], bgColor[2]));
+    
+    drawLines(output, lines, 1, false);
+    drawCircles(output, circles, 1, false);
+    drawAreas(output, bgColor, areas, 1);
+    imwrite("./output_original.png", output);
     
     
     double t=(double)cvGetTickCount();
@@ -168,13 +172,15 @@ int main(int argc, const char * argv[]) {
     t = (double)cvGetTickCount();
     RgBlur(lg);
     t=((double)cvGetTickCount() - t) / (cvGetTickFrequency() * 1000);
-    cout << "Kernel filter: " << t << " ms" << endl;
-    
+    cout << "Blur " << t << " ms" << endl;
+
     t = (double)cvGetTickCount();
-    RgShrink(lg, output);
+    RgShrink(lg, aaoutput);
     t=((double)cvGetTickCount() - t) / (cvGetTickFrequency() * 1000);
     cout << "Shrink: " << t << " ms" << endl;
     
-    imwrite("./output.png", output);
+    imwrite("./output_aa.png", aaoutput);
+    
+    
     return 0;
 }
