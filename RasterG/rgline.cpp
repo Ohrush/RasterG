@@ -8,9 +8,10 @@
 
 
 #include "rgline.h"
+#include "rgssaa.h"
 
 
-void RgLineMid(Mat &src, Point_<int> p1, Point_<int> p2, Vec3b color)
+void RgLineMid(Mat &src, Point_<int> p1, Point_<int> p2, Vec3b color, bool RG_AA)
 {
     int x0, x1, y0, y1;
     if(p1.x < p2.x)
@@ -23,7 +24,10 @@ void RgLineMid(Mat &src, Point_<int> p1, Point_<int> p2, Vec3b color)
     {
         for(int yb = min(y0, y1), ye = max(y0, y1); yb <= ye; yb++)
         {
-            src.at<Vec3b>(x, yb) = color;
+            if(RG_AA)
+                RgKernelPoint(src, x, yb, color);
+            else
+                src.at<Vec3b>(x, yb) = color;
         }
         return;
     }
@@ -31,7 +35,10 @@ void RgLineMid(Mat &src, Point_<int> p1, Point_<int> p2, Vec3b color)
     if(k == 0)
     {
         for(; x <= x1; x++)
-            src.at<Vec3b>(x, y) = color;
+            if(RG_AA)
+                RgKernelPoint(src, x, y, color);
+            else
+                src.at<Vec3b>(x, y) = color;
     }
     else if(k > 0)
     {
@@ -39,28 +46,40 @@ void RgLineMid(Mat &src, Point_<int> p1, Point_<int> p2, Vec3b color)
         {
             int d = 2 * a + b;
             int d1 = 2 * a, d2 = 2 * (a + b);
-            src.at<Vec3b>(x, y) = color;
+            if(RG_AA)
+                RgKernelPoint(src, x, y, color);
+            else
+                src.at<Vec3b>(x, y) = color;
             while(x < x1)
             {
                 if(d < 0)
                     x++, y++, d += d2;
                 else
                     x++, d += d1;
-                src.at<Vec3b>(x, y) = color;
+                if(RG_AA)
+                    RgKernelPoint(src, x, y, color);
+                else
+                    src.at<Vec3b>(x, y) = color;
             }
         }
         else
         {
             int d = a + 2 * b;
             int d1 = 2 * b, d2 = 2 * (a + b);
-            src.at<Vec3b>(x, y) = color;
+            if(RG_AA)
+                RgKernelPoint(src, x, y, color);
+            else
+                src.at<Vec3b>(x, y) = color;
             while(x < x1)
             {
                 if(d < 0)
                     y++, d += d1;
                 else
                     x++, y++, d += d2;
-                src.at<Vec3b>(x, y) = color;
+                if(RG_AA)
+                    RgKernelPoint(src, x, y, color);
+                else
+                    src.at<Vec3b>(x, y) = color;
             }
         }
     }
@@ -70,28 +89,40 @@ void RgLineMid(Mat &src, Point_<int> p1, Point_<int> p2, Vec3b color)
         {
             int d = 2 * a - b;
             int d1 = 2 * a, d2 = 2 * (a - b);
-            src.at<Vec3b>(x, y) = color;
+            if(RG_AA)
+                RgKernelPoint(src, x, y, color);
+            else
+                src.at<Vec3b>(x, y) = color;
             while(x < x1)
             {
                 if(d < 0)
                     x++, d += d1;
                 else
                     x++, y--, d += d2;
-                src.at<Vec3b>(x, y) = color;
+                if(RG_AA)
+                    RgKernelPoint(src, x, y, color);
+                else
+                    src.at<Vec3b>(x, y) = color;
             }
         }
         else
         {
             int d = a - 2 * b;
             int d1 = - 2 * b, d2 = 2 * (a - b);
-            src.at<Vec3b>(x, y) = color;
+            if(RG_AA)
+                RgKernelPoint(src, x, y, color);
+            else
+                src.at<Vec3b>(x, y) = color;
             while(x < x1)
             {
                 if(d < 0)
                     x++, y--, d += d2;
                 else
                     y--, d += d1;
-                src.at<Vec3b>(x, y) = color;
+                if(RG_AA)
+                    RgKernelPoint(src, x, y, color);
+                else
+                    src.at<Vec3b>(x, y) = color;
             }
         }
     }

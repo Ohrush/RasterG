@@ -12,6 +12,6 @@
 #include <opencv2/core/core.hpp>
 using namespace cv;
 
-void RgLineMid(Mat &src, Point_<int> start, Point_<int> end, Vec3b color);
+void RgLineMid(Mat &src, Point_<int> start, Point_<int> end, Vec3b color, bool RG_AA = false);
 
 #endif /* rgline_h */

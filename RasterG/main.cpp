@@ -105,21 +105,21 @@ void readAreas(const char *file, vector<MyArea> &areas)
     fs.close();
 }
 
-void drawLines(Mat &src, vector<MyLine> &lines, int c = 1)
+void drawLines(Mat &src, vector<MyLine> &lines, int c = 1, bool RG_AA = false)
 {
     for(int i = 0, len = lines.size(); i < len; i ++)
     {
         MyLine line = lines[i];
-        RgLineMid(src, line.start * c, line.end * c, line.color);
+        RgLineMid(src, line.start * c, line.end * c, line.color, RG_AA);
     }
 }
 
-void drawCircles(Mat &src, vector<MyCircle> &circles, int c = 1)
+void drawCircles(Mat &src, vector<MyCircle> &circles, int c = 1, bool RG_AA = false)
 {
     for(int i = 0, len = circles.size(); i < len; i ++)
     {
         MyCircle circle = circles[i];
-        RgCircleMid(src, circle.center * c, circle.r * c, circle.color);
+        RgCircleMid(src, circle.center * c, circle.r * c, circle.color, RG_AA);
     }
 }
 
@@ -133,6 +133,9 @@ void drawAreas(Mat &src, Vec3b bg, vector<MyArea> &areas, int c = 1)
 }
 
 int main(int argc, const char * argv[]) {
+    
+    
+    
     int width, height, c = 3;
     Vec3b bgColor;
     vector<MyLine> lines;
@@ -145,11 +148,33 @@ int main(int argc, const char * argv[]) {
     readAreas("./areas", areas);
     Mat lg(width_lg, height_lg, CV_8UC3, Scalar(bgColor[0], bgColor[1], bgColor[2]));
     Mat output(width, height, CV_8UC3, Scalar(bgColor[0], bgColor[1], bgColor[2]));
-    drawLines(lg, lines, c);
-    drawCircles(lg, circles, c);
+    
+    
+    double t=(double)cvGetTickCount();
+    drawLines(lg, lines, c, true);
+    t=((double)cvGetTickCount() - t) / (cvGetTickFrequency() * 1000);
+    cout << "Draw lines: " << t << " ms" << endl;
+    
+    t = (double)cvGetTickCount();
+    drawCircles(lg, circles, c, true);
+    t=((double)cvGetTickCount() - t) / (cvGetTickFrequency() * 1000);
+    cout << "Draw circles: " << t << " ms" << endl;
+    
+    t = (double)cvGetTickCount();
     drawAreas(lg, bgColor, areas, c);
-    RgKernelFilter(lg);
+    t=((double)cvGetTickCount() - t) / (cvGetTickFrequency() * 1000);
+    cout << "Fill areas: " << t << " ms" << endl;
+    
+    t = (double)cvGetTickCount();
+    RgBlur(lg);
+    t=((double)cvGetTickCount() - t) / (cvGetTickFrequency() * 1000);
+    cout << "Kernel filter: " << t << " ms" << endl;
+    
+    t = (double)cvGetTickCount();
     RgShrink(lg, output);
+    t=((double)cvGetTickCount() - t) / (cvGetTickFrequency() * 1000);
+    cout << "Shrink: " << t << " ms" << endl;
+    
     imwrite("./output.png", output);
     return 0;
 }

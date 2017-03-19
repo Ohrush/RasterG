@@ -9,7 +9,7 @@
 #include "rgssaa.h"
 
 
-void RgKernelFilter(Mat &src)
+void RgBlur(Mat &src)
 {
     Mat copy = src.clone();
 //    int c = 3;
@@ -52,14 +52,6 @@ void RgShrink(Mat& lg, Mat& sm)
 {
     int c = 3;
     int filter[9] = {1, 2, 1, 2, 4, 2, 1, 2, 1};
-//    int c = 7;
-//    int filter[49] = {1, 2, 3, 4, 3, 2, 1,
-//        2, 4, 6, 8, 6, 4, 2,
-//        3, 6, 9, 12, 9, 6, 3,
-//        4, 8, 12, 16, 12, 8, 4,
-//        3, 6, 9, 12, 9, 6, 3,
-//        2, 4, 6, 8, 6, 4, 2,
-//        1, 2, 3, 4, 3, 2, 1};
     int rowsl = lg.rows, colsl = lg.cols;
     int rowss = rowsl / c, colss = colsl / c;
     int weight = 0;
@@ -81,6 +73,31 @@ void RgShrink(Mat& lg, Mat& sm)
                 }
             Vec3b newColor = Vec3b(sumb / weight, sumg / weight, sumr / weight);
             sm.at<Vec3b>(i, j) = newColor;
+        }
+}
+
+
+void RgKernelPoint(Mat& src, int i, int j, Vec3b color)
+{
+    int rows = src.rows, cols = src.cols;
+    int c = 3;
+    int filter[9] = {1, 2, 1, 2, 4, 2, 1, 2, 1};
+    int base = 4;
+    int cnt = 0;
+    for(int dr = c / 2, ii = - dr; ii <= dr; ii ++)
+        for(int dc = c / 2, jj = - dc; jj <= dc; jj ++)
+        {
+            int x = i + ii, y = j + jj;
+            if(x >= 0 && x < rows && y >= 0 && y < cols)
+            {
+                Vec3b oldColor = color;
+                int b = oldColor[0] * filter[cnt] / base;
+                int g = oldColor[1] * filter[cnt] / base;
+                int r = oldColor[2] * filter[cnt] / base;
+                Vec3b newColor = Vec3b(b, g, r);
+                src.at<Vec3b>(x, y) = newColor;
+            }
+            cnt ++;
         }
 }
 

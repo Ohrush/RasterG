@@ -13,7 +13,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 using namespace cv;
 
-void RgKernelFilter(Mat &src);
+void RgBlur(Mat &src);
 void RgShrink(Mat& lg, Mat& sm);
+void RgKernelPoint(Mat& src, int i, int j, Vec3b color);
 
 #endif /* rgssaa_h */
